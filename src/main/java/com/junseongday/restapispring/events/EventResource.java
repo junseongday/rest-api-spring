@@ -1,17 +1,15 @@
 package com.junseongday.restapispring.events;
 
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.Link;
 import org.springframework.hateoas.RepresentationModel;
 
-public class EventResource extends RepresentationModel {
-    @JsonUnwrapped
-    private Event event;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
-    public EventResource(Event event) {
-        this.event = event;
-    }
-
-    public Event getEvent() {
-        return event;
+public class EventResource extends EntityModel<Event> {
+    public EventResource(Event event, Link... links) {
+        super(event, links);
+        add(linkTo(EventController.class).slash(event.getId()).withSelfRel());
     }
 }
