@@ -220,7 +220,7 @@ public class EventControllerTests {
                 .andExpect(jsonPath("_embedded.eventList[0]._links.self").exists())
                 .andExpect(jsonPath("_links.self").exists())
                 .andExpect(jsonPath("_links.profile").exists())
-        .andDo(document("query-events"))
+        .andDo(document("get-events"))
         ;
     }
 

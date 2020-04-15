@@ -38,7 +38,6 @@ public class EventController {
 
     @PostMapping
     public ResponseEntity createEvent(@RequestBody @Valid EventDto eventDto, Errors errors) {
-        System.out.println("@@@@::" + errors);
         if (errors.hasErrors()) {
             return badRequest(errors);
         }
