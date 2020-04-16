@@ -1,9 +1,14 @@
 package com.junseongday.restapispring.events;
 
+import com.junseongday.restapispring.accounts.Account;
+import com.junseongday.restapispring.accounts.AccountRepository;
+import com.junseongday.restapispring.accounts.AccountRole;
 import com.junseongday.restapispring.accounts.AccountService;
+import com.junseongday.restapispring.common.AppProperties;
 import com.junseongday.restapispring.common.BaseControllerTest;
 import com.junseongday.restapispring.common.TestDescription;
 import org.jetbrains.annotations.NotNull;
+import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.MediaTypes;
@@ -13,6 +18,7 @@ import org.springframework.security.oauth2.common.util.Jackson2JsonParser;
 import org.springframework.test.web.servlet.ResultActions;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 import java.util.stream.IntStream;
 
 import static org.hamcrest.Matchers.not;
@@ -33,8 +39,19 @@ public class EventControllerTests extends BaseControllerTest {
     EventRepository eventRepository;
 
     @Autowired
+    AccountRepository accountRepository;
+
+    @Autowired
     AccountService accountService;
 
+    @Autowired
+    AppProperties appProperties;
+
+    @Before
+    public void dbClear(){
+        eventRepository.deleteAll();
+        accountRepository.deleteAll();
+    }
 
     @Test
     @TestDescription("정상적으로 이벵트를 생성하는 태스트")
@@ -343,10 +360,18 @@ public class EventControllerTests extends BaseControllerTest {
     }
 
     private String getAccessToken() throws Exception{
-        String username = "junseong@gmail.com";
-        String password = "junseong";
-        String clentId = "myApp";
-        String clientSecret = "pass";
+        String username = appProperties.getUserUsername();
+        String password = appProperties.getUserPassword();
+        String clentId = appProperties.getClientId();
+        String clientSecret = appProperties.getClientSecret();
+
+        Account junseong = Account.builder()
+                .email(username)
+                .password(password)
+                .roles(Set.of(AccountRole.ADMIN))
+                .build();
+        accountService.saveAccount(junseong);
+
         ResultActions perform = mockMvc.perform(post("/oauth/token")
                 .with(httpBasic(clentId, clientSecret))
                 .param("username", username)
