@@ -7,10 +7,10 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -20,6 +20,13 @@ public class AccountService implements UserDetailsService {
     @Autowired
     AccountRepository accountRepository;
 
+    @Autowired
+    PasswordEncoder passwordEncoder;
+
+    public Account saveAccount(Account account) {
+        account.setPassword(passwordEncoder.encode(account.getPassword()));
+        return accountRepository.save(account);
+    }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -28,7 +35,7 @@ public class AccountService implements UserDetailsService {
         return new User(account.getEmail(), account.getPassword(), authories(account.getRoles()));
     }
 
-    private Collection<? extends GrantedAuthority> authories(Set<AccoutnRole> roles) {
+    private Collection<? extends GrantedAuthority> authories(Set<AccountRole> roles) {
         return roles.stream()
                 .map(r -> new SimpleGrantedAuthority("ROLE_" + r.name()))
                 .collect(Collectors.toSet());

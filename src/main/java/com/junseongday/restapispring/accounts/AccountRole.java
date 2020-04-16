@@ -1,5 +1,5 @@
 package com.junseongday.restapispring.accounts;
 
-public enum AccoutnRole {
+public enum AccountRole {
     ADMIN, USER
 }
